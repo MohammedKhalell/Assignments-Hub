@@ -1,0 +1,45 @@
+.user-list {
+    width: 250px;
+    border-right: 1px solid #ddd;
+    padding: 16px;
+    overflow-y: auto;
+  }
+  
+  .user-list ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+  
+  .user-list li {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    color: white;
+  }
+  .active-user-title{
+    margin-bottom: 5%;
+    justify-content: center;
+    display: flex;
+    color:white
+  
+  }
+  .user-list li:hover {
+    background-color: #939292;
+  }
+  
+  .user-list li.active-user {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 12px;
+  }
+  
