@@ -1,6 +1,4 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Provider } from 'react-redux';
-import { store } from './store/store';
 import Navbar from './components/navbar';
 import ChatApp from './components/assignments/chat-app/src/App';
 import Form from './components/assignments/form/src/form';
@@ -12,7 +10,6 @@ import './App.css'
 
 function App() {
   return (
-    <Provider store={store}>
       <Router>
         <div className="background">
           <Navbar />
@@ -28,7 +25,6 @@ function App() {
           </div>
         </div>
       </Router>
-    </Provider>
   );
 }
 
