@@ -20,14 +20,19 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Alert,
 } from '@mui/material';
 import {
   Edit as EditIcon,
   Delete as DeleteIcon,
   Sort as SortIcon,
   Save as SaveIcon,
+  Star as StarIcon,
 } from '@mui/icons-material';
 import { isAfter, addDays } from 'date-fns';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleFavorite, removeFromFavorites } from './Slice';
+import { Link } from 'react-router-dom';
 
 
 
@@ -39,6 +44,8 @@ const TaskList = () => {
   const [editingTask, setEditingTask] = useState(null);
   const [editErrors, setEditErrors] = useState({});
   const [deleteConfirm, setDeleteConfirm] = useState({ open: false, taskId: null });
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const filteredTasks = tasks
     .filter(task => {
@@ -48,13 +55,13 @@ const TaskList = () => {
       }
       if (dateFilter === 'next7days') {
         return isAfter(new Date(task.dueDate), new Date()) &&
-               !isAfter(new Date(task.dueDate), addDays(new Date(), 7));
+          !isAfter(new Date(task.dueDate), addDays(new Date(), 7));
       }
       return true;
     })
     .sort((a, b) => {
       if (!sortConfig.key) return 0;
-      
+
       const direction = sortConfig.direction === 'asc' ? 1 : -1;
       if (sortConfig.key === 'dueDate') {
         return direction * (new Date(a.dueDate) - new Date(b.dueDate));
@@ -97,10 +104,6 @@ const TaskList = () => {
     setDeleteConfirm({ open: true, taskId });
   };
 
-  const handleDeleteConfirm = () => {
-    dispatch({ type: 'DELETE_TASK', payload: deleteConfirm.taskId });
-    setDeleteConfirm({ open: false, taskId: null });
-  };
 
   const handleDeleteCancel = () => {
     setDeleteConfirm({ open: false, taskId: null });
@@ -114,9 +117,56 @@ const TaskList = () => {
       [field]: validateField(field, value)
     });
   };
+  const [storageChoice, setStorageChoice] = useState({
+    open: false,
+    taskId: null
+  });
 
+  const handleFavoriteClick = (taskId) => {
+    setStorageChoice({
+      open: true,
+      taskId
+    });
+  };
+  const reduxDispatch = useDispatch();
+
+  const handleStorageChoice = (storageType) => {
+    if (storageType === 'context') {
+      dispatch({ type: 'TOGGLE_FAVORITE', payload: storageChoice.taskId });
+      setSuccessMessage('Task added to Context API favorites!');
+    } else {
+      const taskToToggle = tasks.find(task => task.id === storageChoice.taskId);
+      reduxDispatch(toggleFavorite(taskToToggle));
+      setSuccessMessage('Task added to Redux favorites!');
+    }
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+    setStorageChoice({ open: false, taskId: null });
+  };
+  const favoriteTasks = useSelector(state => state.favorites.items);
+
+
+  const handleDeleteConfirm = () => {
+    dispatch({ type: 'DELETE_TASK', payload: deleteConfirm.taskId });
+    
+    const existsInFavorites = favoriteTasks.some(task => task.id === deleteConfirm.taskId);
+    if (existsInFavorites) {
+      reduxDispatch(removeFromFavorites(deleteConfirm.taskId));
+    }
+    
+    setSuccessMessage('Task successfully deleted!');
+    setShowSuccess(true);
+    setTimeout(() => setShowSuccess(false), 2000);
+    setDeleteConfirm({ open: false, taskId: null });
+  };
   return (
     <Box>
+      
+       {showSuccess && (
+        <Alert severity="success" sx={{ mb: 2 }}>
+          {successMessage}
+        </Alert>
+      )}
       <Typography variant="h5" gutterBottom sx={{ color: '#1976d2', fontWeight: 'bold', mb: 3 }}>
         Task List
       </Typography>
@@ -224,7 +274,7 @@ const TaskList = () => {
                 </TableCell>
                 <TableCell className='valu-field'>
                   {editingTask?.id === task.id ? (
-                    <TextField 
+                    <TextField
                       value={editingTask.description}
                       onChange={(e) => handleEditChange('description', e.target.value)}
                       error={!!editErrors.description}
@@ -249,6 +299,12 @@ const TaskList = () => {
                     </Button>
                   ) : (
                     <>
+                      <IconButton
+                        color={"warning"}
+                        onClick={() => handleFavoriteClick(task.id)}
+                      >
+                         <StarIcon /> 
+                      </IconButton>
                       <IconButton color="primary" onClick={() => handleEdit(task)}>
                         <EditIcon />
                       </IconButton>
@@ -263,19 +319,56 @@ const TaskList = () => {
           </TableBody>
         </Table>
       </TableContainer>
-
-      <Dialog open={deleteConfirm.open} onClose={handleDeleteCancel}>
-        <DialogTitle>Delete Task</DialogTitle>
+      <Dialog open={storageChoice.open} onClose={() => setStorageChoice({ open: false, taskId: null })}>
+        <DialogTitle>Choose Storage Method</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete this task?
+          How would you like to store this task?
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDeleteCancel}>Cancel</Button>
-          <Button onClick={handleDeleteConfirm} color="error" variant="contained">
-            Delete
+          <Button onClick={() => handleStorageChoice('context')} variant="contained">
+            Context API
+          </Button>
+          <Button onClick={() => handleStorageChoice('redux')} variant="contained" color="secondary">
+            Redux
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog open={deleteConfirm.open} onClose={handleDeleteCancel}>
+        <DialogTitle>
+          {deleteConfirm.type === 'favorite' ? 'Add to Favorites' : 'Delete Task'}
+        </DialogTitle>
+        <DialogContent>
+          {deleteConfirm.message || 'Are you sure you want to delete this task?'}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDeleteCancel}>Cancel</Button>
+          <Button
+            onClick={handleDeleteConfirm}
+            color={deleteConfirm.type === 'favorite' ? "primary" : "error"}
+            variant="contained"
+          >
+            {deleteConfirm.type === 'favorite' ? 'Add to Favorites' : 'Delete'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
+      <Button 
+        component={Link} 
+        to="/task-management/context-favorites"
+        variant="contained"
+        color="primary"
+      >
+        View Context Favorites
+      </Button>
+      <Button 
+        component={Link} 
+        to="/task-management/redux-favorites"
+        variant="contained"
+        color="secondary"
+      >
+        View Redux Favorites
+      </Button>
+    </Stack>
     </Box>
   );
 };

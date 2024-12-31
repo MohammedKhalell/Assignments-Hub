@@ -1,7 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
+import favoritesReducer from '../components/assignments/task-management/src/components/Slice';
 
 export const store = configureStore({
   reducer: {
-    // Add your reducers here
-  },
+    favorites: favoritesReducer
+  }
 });

@@ -1,8 +1,11 @@
+
 import { createContext, useContext, useReducer } from 'react';
 import { isAfter, startOfDay } from 'date-fns';
 
-const TaskContext = createContext();
-
+const TaskContext = createContext({
+  tasks: [],
+  dispatch: () => {}
+});
 export const validateField = (name, value) => {
   switch (name) {
     case 'taskName':
@@ -27,14 +30,28 @@ const taskReducer = (state, action) => {
     case 'ADD_TASK':
       newState = [...state, action.payload];
       break;
-    case 'EDIT_TASK':
-      newState = state.map(task => 
-        task.id === action.payload.id ? action.payload : task
-      );
-      break;
+      case 'EDIT_TASK':
+        newState = state.map(task => 
+          task.id === action.payload.id ? action.payload : task
+        );
+        break;
     case 'DELETE_TASK':
       newState = state.filter(task => task.id !== action.payload);
       break;
+      case 'TOGGLE_FAVORITE':
+        newState = state.map(task => 
+          task.id === action.payload 
+            ? { ...task, isFavorite: true }
+            : task
+        );
+        break;
+      case 'REMOVE_FAVORITE':
+        newState = state.map(task => 
+          task.id === action.payload 
+            ? { ...task, isFavorite: false }
+            : task
+        );
+        break;
     default:
       return state;
   }
@@ -43,17 +60,26 @@ const taskReducer = (state, action) => {
   return newState;
 };
 
+
 export const TaskProvider = ({ children }) => {
   const [tasks, dispatch] = useReducer(
     taskReducer, 
     JSON.parse(localStorage.getItem('tasks')) || []
   );
 
+  const value = { tasks, dispatch };
+
   return (
-    <TaskContext.Provider value={{ tasks, dispatch }}>
+    <TaskContext.Provider value={value}>
       {children}
     </TaskContext.Provider>
   );
 };
 
-export const useTaskContext = () => useContext(TaskContext);
+export const useTaskContext = () => {
+  const context = useContext(TaskContext);
+  if (!context) {
+    throw new Error('useTaskContext must be used within a TaskProvider');
+  }
+  return context;
+};
