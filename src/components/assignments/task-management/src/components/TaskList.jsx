@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useTaskContext, validateField } from '../context/TaskContext';
 import {
@@ -132,7 +133,10 @@ const TaskList = () => {
 
   const handleStorageChoice = (storageType) => {
     if (storageType === 'context') {
-      dispatch({ type: 'TOGGLE_FAVORITE', payload: storageChoice.taskId });
+      dispatch({ 
+        type: 'TOGGLE_FAVORITE', 
+        payload: storageChoice.taskId 
+      });
       setSuccessMessage('Task added to Context API favorites!');
     } else {
       const taskToToggle = tasks.find(task => task.id === storageChoice.taskId);
@@ -143,6 +147,7 @@ const TaskList = () => {
     setTimeout(() => setShowSuccess(false), 2000);
     setStorageChoice({ open: false, taskId: null });
   };
+  
   const favoriteTasks = useSelector(state => state.favorites.items);
 
 
@@ -225,7 +230,7 @@ const TaskList = () => {
           <TableBody >
             {filteredTasks.map(task => (
               <TableRow key={task.id}>
-                <TableCell className='valu-field'>
+                <TableCell className='field'>
                   {editingTask?.id === task.id ? (
                     <TextField
                       value={editingTask.taskName}
@@ -272,7 +277,7 @@ const TaskList = () => {
                     </span>
                   )}
                 </TableCell>
-                <TableCell className='valu-field'>
+                <TableCell className='field'>
                   {editingTask?.id === task.id ? (
                     <TextField
                       value={editingTask.description}
