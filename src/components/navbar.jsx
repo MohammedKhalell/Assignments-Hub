@@ -17,6 +17,9 @@ function Navbar() {
         <li>
           <Link className={styles.navLink} to="/task-management">Task Manager</Link>
         </li>
+        <li>
+          <Link className={styles.navLink} to="/E-commerce/products">E-commerce</Link>
+        </li>
       </ul>
     </nav>
   );
