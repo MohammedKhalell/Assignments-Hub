@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { signup } from './slics/authSlice';
-import { motion } from 'framer-motion';
+import { motion,AnimatePresence  } from 'framer-motion';
+import { FaCheckCircle } from 'react-icons/fa';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,7 @@ const Signup = () => {
   const [errors, setErrors] = useState({});
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const validateForm = () => {
     const newErrors = {};
@@ -29,23 +31,27 @@ const Signup = () => {
     }
     return newErrors;
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formErrors = validateForm();
-    
+   
     if (Object.keys(formErrors).length === 0) {
       const result = await dispatch(signup(formData));
       if (!result.error) {
-        // Show success message
-        alert('Registration successful! Please login.');
-        // Redirect to login page
-        navigate('/E-commerce/login');
+        setShowSuccess(true);
+        setTimeout(() => {
+          setShowSuccess(false);
+          navigate('/E-commerce/login');
+        }, 2000);
       }
     } else {
       setErrors(formErrors);
     }
   };
+  
   return (
+    <>
     <motion.div
     initial={{ opacity: 0, x: 20 }}
     animate={{ opacity: 1, x: 0 }}
@@ -105,7 +111,32 @@ const Signup = () => {
         </button>
       </form>
     </div>
+ 
     </motion.div>
+    <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            className="modal-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="success-modal"
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.5, opacity: 0 }}
+            >
+              <div className="success-icon">
+                <FaCheckCircle />
+              </div>
+              <h3>Registration Successful!</h3>
+              <p>Please login to continue</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </>
   );
 };
 

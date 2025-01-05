@@ -61,14 +61,7 @@ return (
             <h3>{product.title}</h3>
             <p className="price">${product.price}</p>
             <div className="product-buttons">
-              <motion.button
-                className="details-btn"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedProduct(product)}
-              >
-                <FaInfoCircle /> Details
-              </motion.button>
+             
               <motion.button
                 className="add-to-cart-btn"
                 whileHover={{ scale: 1.05 }}

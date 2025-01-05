@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "./slics/cartSlice";
 import { motion } from "framer-motion";
-import { FaCreditCard, FaMapMarkerAlt, FaUser, FaLock } from 'react-icons/fa';
+import { FaCreditCard, FaMapMarkerAlt, FaUser, FaArrowLeft } from 'react-icons/fa';
 
 const Checkout = () => {
   const dispatch = useDispatch();
@@ -122,14 +122,14 @@ const Checkout = () => {
     animate={{ opacity: 1, x: 0 }}
     exit={{ opacity: 0, x: -20 }}
     transition={{ duration: 0.3 }}
-    >      <motion.button
-        className="back-btn"
-        onClick={() => navigate(-1)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        ← 
-      </motion.button>
+    >       <motion.button 
+    className="back-btn"
+    onClick={() => navigate(-1)}
+    whileHover={{ scale: 1.05 }}
+    whileTap={{ scale: 0.95 }}
+  >
+    <FaArrowLeft /> Back to Cart
+  </motion.button>
       <div className="checkout-container">
         <h2 className="title">Checkout</h2>
         <div className="checkout-summary">
