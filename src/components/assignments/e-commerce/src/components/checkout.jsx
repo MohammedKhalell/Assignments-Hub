@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { clearCart } from "./slics/cartSlice";
+import { clearCart } from "../../../../../slics/cartSlice";
 import { motion } from "framer-motion";
 import { FaCreditCard, FaMapMarkerAlt, FaUser, FaArrowLeft } from 'react-icons/fa';
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { signup } from './slics/authSlice';
+import { signup } from '../slics/authSlice';
 import { motion,AnimatePresence  } from 'framer-motion';
 import { FaCheckCircle } from 'react-icons/fa';
 
@@ -42,7 +42,7 @@ const Signup = () => {
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
-          navigate('/E-commerce/login');
+          navigate('/login');
         }, 2000);
       }
     } else {

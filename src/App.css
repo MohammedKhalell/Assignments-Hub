@@ -1,3 +1,13 @@
+body{
+  margin: 0;
+  color: rgba(0, 0, 0, 0.87);
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.5;
+  letter-spacing: 0.00938em;
+  background-color: #fff;
+}
 .background {
   min-height: 100vh;
   background: linear-gradient(45deg, rgb(137, 177, 200) 0%, rgba(255, 255, 255, 0) 70%) repeat scroll 0% 0%, 
