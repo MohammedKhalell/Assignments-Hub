@@ -31,12 +31,22 @@ const Products = () => {
   const [itemToDelete, setItemToDelete] = useState(null);
   const [viewProduct, setViewProduct] = useState(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const isAdmin = true;
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 12; // 3 rows x 4 columns
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = items.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(items.length / itemsPerPage);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
+  // Your existing handlers
   const handleAddToCart = (product) => {
     if (!user) {
       navigate("/login");
@@ -45,8 +55,9 @@ const Products = () => {
     dispatch(addToCart(product));
     setAddedProduct(product);
     setShowAddedModal(true);
-    setTimeout(() => setShowAddedModal(false), 2000); // Auto close after 2 seconds
+    setTimeout(() => setShowAddedModal(false), 2000);
   };
+
   const handleViewDetails = (product) => {
     setViewProduct(product);
   };
@@ -60,13 +71,14 @@ const Products = () => {
     setShowForm(false);
     setSelectedProduct(null);
   };
+
   const getCleanImageUrl = (imageUrl) => {
     if (Array.isArray(imageUrl)) {
-      // Remove any brackets, quotes and clean the URL
       return imageUrl[0].replace(/[\[\]"]/g, "").trim();
     }
     return imageUrl;
   };
+
   const handleDelete = (product) => {
     setItemToDelete(product);
     setShowDeleteModal(true);
@@ -82,6 +94,7 @@ const Products = () => {
       console.error("Error deleting product:", error);
     }
   };
+
   const nextImage = (e) => {
     e.stopPropagation();
     setCurrentImageIndex((prev) =>
@@ -108,7 +121,7 @@ const Products = () => {
         <Loader />
       ) : (
         <div>
-          {user && ( // Only show Add Product button if user is logged in
+          {user && (
             <motion.button
               className="add-product-btn"
               onClick={() => setShowForm(true)}
@@ -118,8 +131,9 @@ const Products = () => {
               <FaPlus /> Add New Product
             </motion.button>
           )}
+
           <div className="products-grid">
-            {items.map((product) => (
+            {currentItems.map((product) => (
               <motion.div
                 key={product.id}
                 className="product-card"
@@ -147,7 +161,7 @@ const Products = () => {
                     >
                       <FaShoppingCart /> Add to Cart
                     </motion.button>
-                    {user && ( // Only show admin controls if user is logged in
+                    {user && (
                       <div className="admin-controls">
                         <motion.button
                           className="edit-btn"
@@ -173,10 +187,44 @@ const Products = () => {
             ))}
           </div>
 
-          {viewProduct && (
-            <div
-              className="modal-overlay"          
+          <div className="pagination">
+            <motion.button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="page-btn prev-next"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
+              <FaChevronLeft />
+            </motion.button>
+
+            {[...Array(totalPages)].map((_, index) => (
+              <motion.button
+                key={index + 1}
+                onClick={() => paginate(index + 1)}
+                className={`page-btn ${
+                  currentPage === index + 1 ? "active" : ""
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {index + 1}
+              </motion.button>
+            ))}
+
+            <motion.button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="page-btn prev-next"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <FaChevronRight />
+            </motion.button>
+          </div>
+
+          {viewProduct && (
+            <div className="modal-overlay">
               <motion.div
                 className="modal-content"
                 initial={{ scale: 0.5, opacity: 0 }}
