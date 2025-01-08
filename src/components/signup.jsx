@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { signup } from '../slics/authSlice';
 import { motion,AnimatePresence  } from 'framer-motion';
 import { FaCheckCircle } from 'react-icons/fa';
+import { validateForm } from './validateForm';
+
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -17,24 +19,9 @@ const Signup = () => {
   const navigate = useNavigate();
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.name) newErrors.name = 'Name is required';
-    if (!formData.email) newErrors.email = 'Email is required';
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 4) {
-      newErrors.password = 'Password must be at least 4 characters long';
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Passwords do not match';
-    }
-    return newErrors;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formErrors = validateForm();
+    const formErrors = validateForm(formData, true);
    
     if (Object.keys(formErrors).length === 0) {
       const result = await dispatch(signup(formData));
