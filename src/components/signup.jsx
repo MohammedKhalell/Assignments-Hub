@@ -25,6 +25,7 @@ const Signup = () => {
    
     if (Object.keys(formErrors).length === 0) {
       const result = await dispatch(signup(formData));
+      
       if (!result.error) {
         setShowSuccess(true);
         setTimeout(() => {
